@@ -1,43 +1,50 @@
-# Task API
+# Nest Task API
 
-A simple NestJS API for managing tasks. Tasks are stored in memory and reset when the app restarts.
+Small NestJS project for CRUD-style task management.
 
-## Setup
+## Run it
 
 ```bash
 npm install
 npm run start:dev
 ```
 
-The API runs at `http://localhost:3003` by default. Set `PORT` to use a different port.
+API runs on `http://localhost:3003` by default.
 
-## Endpoints
+## Routes
 
-| Method | Route | Description |
-| --- | --- | --- |
-| `POST` | `/tasks` | Create a task |
-| `GET` | `/tasks` | List tasks |
-| `GET` | `/tasks/:id` | Get one task |
-| `PATCH` | `/tasks/:id/status` | Update task status |
-| `DELETE` | `/tasks/:id` | Delete a task |
+- `GET /tasks` — list all tasks
+- `GET /tasks/:id` — get a task by id
+- `POST /tasks` — create a task
+- `PATCH /tasks/:id/status` — update task status
+- `DELETE /tasks/:id` — delete a task
 
-Supported statuses: `OPEN`, `IN_PROGRESS`, and `DONE`.
+Supported task statuses:
+
+- `OPEN`
+- `IN_PROGRESS`
+- `DONE`
+
+## Examples
 
 ```bash
+curl http://localhost:3003/tasks
+
 curl -X POST http://localhost:3003/tasks \
   -H 'Content-Type: application/json' \
-  -d '{"title":"Read README","description":"Update project docs"}'
+  -d '{"title":"Read README","description":"Update docs"}'
 
 curl 'http://localhost:3003/tasks?status=OPEN'
 curl 'http://localhost:3003/tasks?search=README'
 ```
 
-## Commands
+## Useful commands
 
 ```bash
-npm run build       # Build
-npm run start:dev   # Development mode
-npm run test        # Unit tests
-npm run test:e2e    # End-to-end tests
-npm run lint        # Lint
+npm run build
+npm run test
+npm run test:e2e
+npm run lint
 ```
+
+This app stores tasks in memory, so data resets when the server restarts.
