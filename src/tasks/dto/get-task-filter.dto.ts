@@ -1,4 +1,4 @@
-import { TaskStatus } from "../task.model.js";
+import { TaskStatus } from "../tasks.types.js";
 import { IsEnum, IsOptional, IsString } from "class-validator";
 
 export class GetTaskFilterDto {
