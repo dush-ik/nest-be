@@ -1,6 +1,6 @@
 
 import { DataSource, Repository } from "typeorm";
-import { ConflictException, Injectable } from "@nestjs/common";
+import { ConflictException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { User } from "./user.entity.js";
 import { AuthCredentialDto } from "./dto/auth.credential.dto.js";
 import * as bcrypt from "bcrypt";
@@ -29,4 +29,5 @@ export class UsersRepository extends Repository<User> {
       }
     }
   }
+
 }
