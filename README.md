@@ -1,67 +1,119 @@
-# Nest Task API
+# NestJS Task Management API
 
-Small NestJS app for managing tasks in memory.
+A NestJS application built with TypeORM and PostgreSQL for task and auth workflows.
 
-## Run
+## Tech stack
+
+- NestJS 12
+- TypeORM
+- PostgreSQL
+- class-validator / class-transformer
+- Vitest for tests
+
+## Prerequisites
+
+- Node.js 18+
+- PostgreSQL running locally on `localhost:5432`
+- Database: `task-management`
+- Credentials: `postgres` / `postgres`
+
+## Setup
 
 ```bash
 npm install
 npm run start:dev
 ```
 
-The app runs on `http://localhost:3003` by default.
+The app starts on:
 
-## Routes
+```text
+http://localhost:3003
+```
 
-- `GET /tasks` — get all tasks or filter with `status` and `search`
-- `GET /tasks/:id` — get a task by id
-- `POST /tasks` — create a task
-- `PATCH /tasks/:id/status` — update a task status
-- `DELETE /tasks/:id` — delete a task
+## Database config
 
-## Task shape
+The app initializes PostgreSQL in `src/app.module.ts` with TypeORM:
+
+```ts
+TypeOrmModule.forRoot({
+  type: 'postgres',
+  host: 'localhost',
+  port: 5432,
+  username: 'postgres',
+  password: 'postgres',
+  database: 'task-management',
+  autoLoadEntities: true,
+  synchronize: true,
+})
+```
+
+## Current API
+
+### Auth
+
+#### `POST /auth/signup`
+Create a new user.
+
+Request body:
 
 ```json
 {
-  "id": "uuid",
-  "title": "Task title",
-  "description": "Task description",
-  "status": "OPEN"
+  "username": "demoUser",
+  "password": "StrongPass!123"
 }
 ```
 
-Valid status values:
+Validation rules:
 
-- `OPEN`
-- `IN_PROGRESS`
-- `DONE`
+- `username`: string, 4-20 chars
+- `password`: string, 8-32 chars, must include uppercase, lowercase, and a number or special character
 
-## Examples
+Duplicate usernames return a `409 Conflict` response.
 
-```bash
-curl http://localhost:3003/tasks
+### Tasks
 
-curl -X POST http://localhost:3003/tasks \
-  -H 'Content-Type: application/json' \
-  -d '{"title":"Read README","description":"Update project docs"}'
+The task module is scaffolded and connected to TypeORM entities. The project includes task routes and a task entity, but the current active implementation is still being built out.
 
-curl 'http://localhost:3003/tasks?status=OPEN'
-curl 'http://localhost:3003/tasks?search=README'
+## Project structure
 
-curl -X PATCH http://localhost:3003/tasks/<id>/status \
-  -H 'Content-Type: application/json' \
-  -d '{"status":"DONE"}'
+```text
+src/
+  app.module.ts
+  main.ts
+  auth/
+    auth.controller.ts
+    auth.module.ts
+    auth.service.ts
+    user.entity.ts
+    users.repository.ts
+    dto/
+      auth.credential.dto.ts
+  tasks/
+    task.entity.ts
+    task.model.ts
+    tasks.controller.ts
+    tasks.module.ts
+    tasks.service.ts
+    tasks.repository.ts
+    dto/
+      create-task.dto.ts
+      get-task-filter.dto.ts
+      update-task-status.dto.ts
 ```
 
-## Commands
+## Useful commands
 
 ```bash
 npm run start
 npm run start:dev
 npm run build
+npm run lint
 npm run test
 npm run test:e2e
-npm run lint
 ```
 
-Tasks are stored in memory only, so they reset when the server restarts.
+## Notes
+
+- The project is using PostgreSQL rather than in-memory task storage.
+- The auth flow includes duplicate-user protection via PostgreSQL unique constraint handling.
+- The task API is still being expanded and may not yet expose all CRUD operations in the controller.
