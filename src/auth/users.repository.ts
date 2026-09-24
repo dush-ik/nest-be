@@ -1,9 +1,7 @@
 
 import { DataSource, Repository } from "typeorm";
-import { ConflictException, Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { User } from "./user.entity.js";
-import { AuthCredentialDto } from "./dto/auth.credential.dto.js";
-import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class UsersRepository extends Repository<User> {
@@ -11,11 +9,7 @@ export class UsersRepository extends Repository<User> {
     super(User, dataSource.createEntityManager());
   }
 
-  async createUser(authCredentialsDto: AuthCredentialDto): Promise<User> {
-    const { username, password } = authCredentialsDto;
-    
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(password, salt);
+  async createUser(username: string, hashedPassword: string): Promise<User> {
 
     const user = this.create({ username, password: hashedPassword });
     try {
@@ -23,7 +17,7 @@ export class UsersRepository extends Repository<User> {
     } catch (error: any) {
       // duplicate username error code in PostgreSQL
       if (error.code === "23505") {
-        throw new ConflictException('Username already exists');
+        throw new Error('DUPLICATE_USERNAME');
       } else {
         throw error;
       }

@@ -70,6 +70,32 @@ Validation rules:
 
 Duplicate usernames return a `409 Conflict` response.
 
+#### `POST /auth/signin`
+Authenticate an existing user and receive a JWT access token.
+
+Request body:
+
+```json
+{
+  "username": "demoUser",
+  "password": "StrongPass!123"
+}
+```
+
+Successful response:
+
+```json
+{
+  "accessToken": "<jwt>"
+}
+```
+
+Send the token on protected requests with the standard bearer header:
+
+```text
+Authorization: Bearer <jwt>
+```
+
 ### Tasks
 
 The task module is scaffolded and connected to TypeORM entities. The project includes task routes and a task entity, but the current active implementation is still being built out.
@@ -86,6 +112,8 @@ src/
     auth.service.ts
     user.entity.ts
     users.repository.ts
+    jwt-interface.ts
+    jwt-strategy.ts
     dto/
       auth.credential.dto.ts
   tasks/
@@ -115,5 +143,7 @@ npm run test:e2e
 ## Notes
 
 - The project is using PostgreSQL rather than in-memory task storage.
+- Passwords are hashed with `bcrypt` before they are stored.
 - The auth flow includes duplicate-user protection via PostgreSQL unique constraint handling.
+- JWTs are signed with the configured NestJS `JwtModule` secret and validated through Passport JWT.
 - The task API is still being expanded and may not yet expose all CRUD operations in the controller.

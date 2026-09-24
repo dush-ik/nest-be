@@ -1,9 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersRepository } from './users.repository.js';
 import { AuthCredentialDto } from './dto/auth.credential.dto.js';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { AccessToken, JwtPayload } from './jwt-payload-interface.js';
+import { AccessToken, JwtPayload } from './jwt-interface.js';
 
 @Injectable()
 export class AuthService {
@@ -13,7 +13,17 @@ export class AuthService {
   {}
 
   async signUp(authCredentialsDto: AuthCredentialDto): Promise<void> {
-    await this.usersRepository.createUser(authCredentialsDto);
+    const { username, password } = authCredentialsDto;
+
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(password, salt);
+    try {
+      await this.usersRepository.createUser(username, hashedPassword);
+    } catch (error: any) {
+      if (error.message === 'DUPLICATE_USERNAME') {
+        throw new ConflictException('Username already exists');
+      }
+      throw error;    }
   }
   
   async signIn(authCredentialsDto: AuthCredentialDto): Promise<AccessToken> {
