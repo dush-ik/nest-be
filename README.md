@@ -112,9 +112,15 @@ Invalid credentials return a `401 Unauthorized` response.
 
 ### Tasks
 
-All task routes require a valid JWT (`AuthGuard`). Each task is linked to the authenticated user that created it (`Task.user`, `User.tasks`).
+All task routes require a valid JWT (`AuthGuard`). Each task is linked to the authenticated user that created it (`Task.user`, `User.tasks`), and every read/update/delete operation is scoped to the requesting user — tasks belonging to other users are not visible or modifiable.
 
-The task module is scaffolded and connected to TypeORM entities. The project includes task routes and a task entity, but the current active implementation is still being built out.
+- `GET /tasks` — list the current user's tasks, optionally filtered by `status` and `search`.
+- `GET /tasks/:id` — fetch one of the current user's tasks by ID.
+- `POST /tasks` — create a task owned by the current user.
+- `PATCH /tasks/:id/status` — update the status of one of the current user's tasks.
+- `DELETE /tasks/:id` — delete one of the current user's tasks.
+
+Responses are serialized through a global `TransformInterceptor` (`src/transform.interceptor.ts`), which strips the `user` relation (marked `@Exclude` on `Task`) from task payloads.
 
 ## Project structure
 
