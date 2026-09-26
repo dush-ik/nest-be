@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Delete } from '@nestjs/common';
 import { AuthService } from './auth.service.js';
 import { AuthCredentialDto } from './dto/auth.credential.dto.js';
 import { AccessToken } from './jwt-interface.js';
@@ -15,5 +15,10 @@ export class AuthController {
   @Post('/signin')
   async signIn(@Body() authCredentialDto: AuthCredentialDto): Promise<AccessToken> {
     return await this.authService.signIn(authCredentialDto);
+  }
+
+  @Delete('/deleteuser')
+  async deleteUser(@Body() authCredentialDto: AuthCredentialDto): Promise<void> {
+    await this.authService.deleteUser(authCredentialDto);
   }
 }

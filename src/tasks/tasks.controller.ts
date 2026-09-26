@@ -5,6 +5,8 @@ import { CreateTaskDto } from './dto/create-task.dto.js';
 import { GetTaskFilterDto } from './dto/get-task-filter.dto.js';
 import { UpdateTaskStatusDto } from './dto/update-task-status.dto.js';
 import type { Task } from './task.entity.js';
+import { GetUser } from '../auth/get-user.decorator.js';
+import { User } from '../auth/user.entity.js';
 
 @UseGuards(AuthGuard())
 @Controller('tasks')
@@ -22,8 +24,11 @@ export class TasksController {
   }
 
   @Post()
-  createTask(@Body() createTaskDto: CreateTaskDto): Promise<Task> {
-    return this.tasksService.createTask(createTaskDto);
+  createTask(
+    @Body() createTaskDto: CreateTaskDto, 
+    @GetUser() user: User
+  ): Promise<Task> {
+    return this.tasksService.createTask(createTaskDto, user);
   }
 
   @Delete('/:id')

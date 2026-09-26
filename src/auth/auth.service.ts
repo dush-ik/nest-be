@@ -38,4 +38,15 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials'); 
     }
   }
+
+  async deleteUser(authCredentialsDto: AuthCredentialDto): Promise<void> {
+    const { username, password } = authCredentialsDto;
+    const user = await this.usersRepository.findOne({ where: { username } });
+
+    if (user && await bcrypt.compare(password, user.password)) {
+      await this.usersRepository.delete(user.id);
+    } else {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+  }
 }

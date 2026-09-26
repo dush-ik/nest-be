@@ -96,7 +96,23 @@ Send the token on protected requests with the standard bearer header:
 Authorization: Bearer <jwt>
 ```
 
+#### `DELETE /auth/deleteuser`
+Delete an existing user after re-verifying credentials.
+
+Request body:
+
+```json
+{
+  "username": "demoUser",
+  "password": "StrongPass!123"
+}
+```
+
+Invalid credentials return a `401 Unauthorized` response.
+
 ### Tasks
+
+All task routes require a valid JWT (`AuthGuard`). Each task is linked to the authenticated user that created it (`Task.user`, `User.tasks`).
 
 The task module is scaffolded and connected to TypeORM entities. The project includes task routes and a task entity, but the current active implementation is still being built out.
 

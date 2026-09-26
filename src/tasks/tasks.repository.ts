@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { Task } from './task.entity.js';
 import { CreateTaskDto } from './dto/create-task.dto.js';
+import type { User } from '../auth/user.entity.js';
 import { TaskStatus } from './tasks.types.js';
 import { GetTaskFilterDto } from './dto/get-task-filter.dto.js';
 
@@ -27,12 +28,13 @@ export class TasksRepository extends Repository<Task> {
     return tasks;
   }
 
-  async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
+  async createTask(createTaskDto: CreateTaskDto, user: User): Promise<Task> {
     const { title, description } = createTaskDto;
     const task = this.create({
       title,
       description,
       status: TaskStatus.OPEN,
+      user,
     });
     await this.save(task);
     return task;

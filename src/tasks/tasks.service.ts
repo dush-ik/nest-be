@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import {  TaskStatus } from './tasks.types.js';
 import type { CreateTaskDto } from './dto/create-task.dto.js';
 import type { GetTaskFilterDto } from './dto/get-task-filter.dto.js';
+import type { User } from '../auth/user.entity.js';
 import { Task } from './task.entity.js';
 import { TasksRepository } from './tasks.repository.js';
 
@@ -23,8 +24,8 @@ export class TasksService {
     return foundTask;
   }
 
-  async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
-    return this.tasksRepository.createTask(createTaskDto);
+  async createTask(createTaskDto: CreateTaskDto, user: User): Promise<Task> {
+    return this.tasksRepository.createTask(createTaskDto, user);
   }
 
   async deleteTask(id: string): Promise<void> {
