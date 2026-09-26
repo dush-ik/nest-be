@@ -122,6 +122,8 @@ All task routes require a valid JWT (`AuthGuard`). Each task is linked to the au
 
 Responses are serialized through a global `TransformInterceptor` (`src/transform.interceptor.ts`), which strips the `user` relation (marked `@Exclude` on `Task`) from task payloads.
 
+Requests are logged via NestJS's built-in `Logger` in `TasksController` (per-action, including the acting user) and `TasksRepository` (errors from the `getTasks` query are logged and surfaced as a `500 Internal Server Error`).
+
 ## Project structure
 
 ```text

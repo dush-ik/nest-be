@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Param, Delete, Patch, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Param, Delete, Patch, Query, UseGuards, Logger } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { TasksService } from './tasks.service.js';
 import { CreateTaskDto } from './dto/create-task.dto.js';
@@ -11,15 +11,27 @@ import { User } from '../auth/user.entity.js';
 @UseGuards(AuthGuard())
 @Controller('tasks')
 export class TasksController {
+  private logger = new Logger('TasksController');
+
   constructor(private readonly tasksService: TasksService) {}
 
   @Get()
-  getTasks(@Query() filterDto: GetTaskFilterDto, @GetUser() user: User): Promise<Task[]> {
+  getTasks(
+    @Query() filterDto: GetTaskFilterDto, 
+    @GetUser() user: User
+  ): Promise<Task[]> {
+    this.logger.verbose(
+      `User "${user.username}" retrieving all tasks. Filters: ${JSON.stringify(filterDto)}`
+    );
     return this.tasksService.getTasks(filterDto, user);
   }
 
   @Get('/:id')
-  getTaskById(@Param('id') id: string, @GetUser() user: User): Promise<Task> {
+  getTaskById(
+    @Param('id') id: string, 
+    @GetUser() user: User
+  ): Promise<Task> {
+    this.logger.log(`User "${user.username}" retrieving task with ID "${id}"`);
     return this.tasksService.getTaskById(id, user);
   }
 
@@ -28,11 +40,16 @@ export class TasksController {
     @Body() createTaskDto: CreateTaskDto, 
     @GetUser() user: User
   ): Promise<Task> {
+    this.logger.log(`User "${user.username}" creating a new task. Data: ${JSON.stringify(createTaskDto)}`);
     return this.tasksService.createTask(createTaskDto, user);
   }
 
   @Delete('/:id')
-  deleteTask(@Param('id') id: string, @GetUser() user: User): Promise<void> {
+  deleteTask(
+    @Param('id') id: string, 
+    @GetUser() user: User
+  ): Promise<void> {
+    this.logger.log(`User "${user.username}" deleting task with ID "${id}"`);
     return this.tasksService.deleteTask(id, user);
   }
 
@@ -42,6 +59,7 @@ export class TasksController {
     @Body() updateTaskStatusDto: UpdateTaskStatusDto,
     @GetUser() user: User
   ): Promise<Task> {
+    this.logger.log(`User "${user.username}" updating status of task with ID "${id}" to "${updateTaskStatusDto.status}"`);
     const { status } = updateTaskStatusDto;
     return this.tasksService.updateTaskStatus(id, status, user);
   }
