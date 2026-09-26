@@ -13,9 +13,7 @@ A NestJS application built with TypeORM and PostgreSQL for task and auth workflo
 ## Prerequisites
 
 - Node.js 18+
-- PostgreSQL running locally on `localhost:5432`
-- Database: `task-management`
-- Credentials: `postgres` / `postgres`
+- PostgreSQL running locally (host/port/credentials configured via env, see below)
 
 ## Setup
 
@@ -30,22 +28,34 @@ The app starts on:
 http://localhost:3003
 ```
 
-## Database config
+## Configuration
 
-The app initializes PostgreSQL in `src/app.module.ts` with TypeORM:
+Config is loaded via `@nestjs/config`'s `ConfigModule` (registered as global in `src/app.module.ts`) from a stage-specific env file, `.env.stage.<STAGE>`, selected by the `STAGE` environment variable (`dev` for `start:dev`/`test*` scripts, `prod` for `start:prod`). These files are gitignored — create your own locally.
 
-```ts
-TypeOrmModule.forRoot({
-  type: 'postgres',
-  host: 'localhost',
-  port: 5432,
-  username: 'postgres',
-  password: 'postgres',
-  database: 'task-management',
-  autoLoadEntities: true,
-  synchronize: true,
-})
+Required variables (validated at startup against `src/config.schema.ts` using `joi`; the app fails fast if any are missing):
+
+| Variable | Description |
+| --- | --- |
+| `STAGE` | Environment name, must match the `.env.stage.<STAGE>` suffix |
+| `DB_HOST` | PostgreSQL host |
+| `DB_PORT` | PostgreSQL port (defaults to `5432`) |
+| `DB_USERNAME` | PostgreSQL username |
+| `DB_PASSWORD` | PostgreSQL password |
+| `DB_DATABASE` | PostgreSQL database name |
+| `JWT_SECRET` | Secret used to sign/verify JWTs (`JwtModule` and `JwtStrategy`) |
+
+Example `.env.stage.dev`:
+
+```text
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+DB_DATABASE=task-management
+JWT_SECRET=<your-secret>
 ```
+
+TypeORM is configured via `TypeOrmModule.forRootAsync` in `src/app.module.ts`, reading these values through `ConfigService`.
 
 ## Current API
 
